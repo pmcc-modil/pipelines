@@ -1,0 +1,33 @@
+configfile: "config.yaml"
+
+import pandas as pd
+
+samples = pd.read_table(
+    config["sample_file"]
+).set_index(
+    "sample", drop=False
+)
+
+
+def get_r1(wildcards):
+    return samples.read1[wildcards.sample]
+
+def get_r2(wildcards):
+    return samples.read2[wildcards.sample]
+
+
+rule all:
+    input: expand("/cluster/projects/bhklab/Data/biobank_merged_RNAseq/Kallisto/hg38/{sample}/quant", sample = samples["sample"])
+
+
+rule mapKallisto:
+    input:
+        r1 =  get_r1,
+        r2 =  get_r2,
+        transcriptome = "/cluster/home/amammoli/kallisto/gencode_v33/gencodev33.kalliso.v461.idx"
+    output: directory("/cluster/projects/bhklab/Data/biobank_merged_RNAseq/Kallisto/hg38/{sample}/quant")
+    shell:
+     """
+     module load kallisto/0.46.1
+     kallisto quant -i {input.transcriptome} -o {output} -t 2 {input.r1} {input.r2}
+     """
