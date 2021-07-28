@@ -1,0 +1,2 @@
+sample  read1   read2
+S3_MDA  /path/to/S3_MDA_R1.fastq.gz  /path/to/S3_MDA_R2.fastq.gz
